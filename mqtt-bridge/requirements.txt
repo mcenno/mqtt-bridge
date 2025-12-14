@@ -1,0 +1,4 @@
+flatten-json
+influxdb_client
+requests
+paho-mqtt
