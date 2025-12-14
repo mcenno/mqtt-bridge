@@ -121,17 +121,24 @@ class MQTTSource(MessageSource):
                 msg.topic,
                 msg.payload,
             )
-            simple_tokens = ["fhz", "wh", "car", "amp", "frc"]
+            tasmota_simple_tokens = [
+                "Z1_curr_w",
+                "Z1_total_kwh",
+                "Z1_total_kwh_out",
+                "Z3_curr_w",
+                "Z3_total_kwh",
+                "Z3_total_kwh_out",
+            ]
+            simple_tokens = ["fhz", "wh", "car", "amp", "frc"] + tasmota_simple_tokens
             complex_tokens = ["nrg", "isv"]
-            tokens = simple_tokens + complex_tokens
+            tokens = simple_tokens + complex_tokens + tasmota_simple_tokens
 
-            node_name = "/".join(msg.topic.split("/", 2)[:2])
-            measurement_name = msg.topic.split("/")[-1]
+            node_name, measurement_name = msg.topic.rsplit("/", 1)
             if measurement_name not in tokens:
                 return
 
             value = msg.payload
-
+            self.logger.debug("Processing measurement %s with value %s", measurement_name, value)
             if measurement_name == "isv":
                 json_data = {
                     f"{code}_{i + 1}": float(subdict[code])
@@ -165,13 +172,15 @@ class MQTTSource(MessageSource):
                 # need to convert all values to floats
                 json_data = {key: float(value) for key, value in json_data.items()}
                 # add number of active phases
-                json_data["n_phases"] = float(len(
-                    [
-                        val
-                        for key, val in json_data.items()
-                        if key.startswith("P_L") and val > 500.0
-                    ]
-                ))
+                json_data["n_phases"] = float(
+                    len(
+                        [
+                            val
+                            for key, val in json_data.items()
+                            if key.startswith("P_L") and val > 500.0
+                        ]
+                    )
+                )
             if measurement_name in simple_tokens:
                 json_data = {measurement_name: float(msg.payload)}
 
@@ -239,13 +248,13 @@ def main():
         stringify_values_for_measurements=args.stringify_values_for_measurements,
     )
     source.register_store(store)
-    
+
     while True:
         try:
             print("Forwarder wird gestartet")
             source.start()
-        except:
-            print("Timeout abgefangen")
+        except Exception as e:
+            print(f"Fehler abgefangen: {e}")
 
 
 if __name__ == "__main__":

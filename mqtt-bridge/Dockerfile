@@ -10,7 +10,12 @@ COPY forwarder.py .
 COPY .env.influxdb2-admin-password .
 RUN pwd; ls -al
 #CMD [ "python", "./forwarder.py" ]
-CMD ["python", "./forwarder.py", "--mqtt-host", "192.168.178.51",  "--influx-host", "influxdb2", \
-     "--influx-user", "admin", "--influx-pass-file", ".env.influxdb2-admin-password", \
-     "--influx-db", "home",  "--node-name", "go-eCharger/265302", "--node-name", "go-eController/911832"]
-
+CMD ["python", "./forwarder.py", \
+     "--mqtt-host", "192.168.178.51", \
+     "--influx-host", "influxdb2", \
+     "--influx-user", "admin", \
+     "--influx-pass-file", ".env.influxdb2-admin-password", \
+     "--influx-db", "home", \
+     "--node-name", "go-eCharger/265302", \
+     "--node-name", "go-eController/911832",\
+     "--node-name", "tasmota"]
