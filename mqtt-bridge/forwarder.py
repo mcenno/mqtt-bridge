@@ -192,11 +192,17 @@ class MQTTSource(MessageSource):
 
     def start(self):
         self.client.connect(self.host, self.port)
-        # Blocking call that processes network traffic, dispatches callbacks and
-        # handles reconnecting.
-        # Other loop*() functions are available that give a threaded interface and a
-        # manual interface.
-        self.client.loop_forever()
+        # Use threaded loop instead of blocking loop_forever()
+        self.client.loop_start()
+        
+        # Keep main thread alive
+        try:
+            while True:
+                import time
+                time.sleep(1)
+        except KeyboardInterrupt:
+            self.client.loop_stop()
+            self.client.disconnect()
 
 
 def main():
