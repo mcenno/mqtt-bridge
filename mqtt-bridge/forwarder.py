@@ -123,13 +123,8 @@ class MQTTSource(MessageSource):
             )
             tasmota_simple_tokens = [
                 "Z1_curr_w",
-                "Z1_total_kwh",
-                "Z1_total_kwh_out",
-                "Z3_curr_w",
-                "Z3_total_kwh",
-                "Z3_total_kwh_out",
             ]
-            simple_tokens = ["fhz", "wh", "car", "amp", "frc"] + tasmota_simple_tokens
+            simple_tokens = ["wh", "car", "frc"] + tasmota_simple_tokens
             complex_tokens = ["nrg", "isv"]
             tokens = simple_tokens + complex_tokens + tasmota_simple_tokens
 
@@ -143,28 +138,17 @@ class MQTTSource(MessageSource):
                 json_data = {
                     f"{code}_{i + 1}": float(subdict[code])
                     for i, subdict in enumerate(json.loads(value))
-                    for code in ["i", "p", "f"]
+                    for code in ["p"]
                 }
             if measurement_name == "nrg":
                 json_data = dict(
                     zip(
                         [
-                            "U_L1",
-                            "U_L2",
-                            "U_L3",
-                            "U_N",
-                            "I_L1",
-                            "I_L2",
-                            "I_L3",
                             "P_L1",
                             "P_L2",
                             "P_L3",
                             "P_N",
                             "P_Total",
-                            "pf_L1",
-                            "pf_L2",
-                            "pf_L3",
-                            "pf_N",
                         ],
                         list(json.loads(value)),
                     )
@@ -193,16 +177,7 @@ class MQTTSource(MessageSource):
     def start(self):
         self.client.connect(self.host, self.port)
         # Use threaded loop instead of blocking loop_forever()
-        self.client.loop_start()
-        
-        # Keep main thread alive
-        try:
-            while True:
-                import time
-                time.sleep(1)
-        except KeyboardInterrupt:
-            self.client.loop_stop()
-            self.client.disconnect()
+        self.client.loop_forever()
 
 
 def main():
