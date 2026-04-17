@@ -124,7 +124,7 @@ class MQTTSource(MessageSource):
             tasmota_simple_tokens = [
                 "Z1_curr_w",
             ]
-            simple_tokens = ["wh", "car", "frc"] + tasmota_simple_tokens
+            simple_tokens = ["wh", "car", "frc", "psm"] + tasmota_simple_tokens
             complex_tokens = ["nrg", "isv"]
             tokens = simple_tokens + complex_tokens + tasmota_simple_tokens
 
@@ -150,7 +150,7 @@ class MQTTSource(MessageSource):
                             "P_N",
                             "P_Total",
                         ],
-                        list(json.loads(value)),
+                        list(json.loads(value))[7:12],
                     )
                 )
                 # need to convert all values to floats
