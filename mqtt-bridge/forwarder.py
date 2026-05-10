@@ -124,7 +124,16 @@ class MQTTSource(MessageSource):
             tasmota_simple_tokens = [
                 "Z1_curr_w",
             ]
-            simple_tokens = ["wh", "car", "frc", "psm"] + tasmota_simple_tokens
+            simple_tokens = [
+                "wh",
+                "car",
+                "frc",
+                "psm",
+                "power",
+                "l1_ac_power",
+                "l2_ac_power",
+                "l3_ac_power",
+            ] + tasmota_simple_tokens
             complex_tokens = ["nrg", "isv"]
             tokens = simple_tokens + complex_tokens + tasmota_simple_tokens
 
@@ -133,7 +142,9 @@ class MQTTSource(MessageSource):
                 return
 
             value = msg.payload
-            self.logger.debug("Processing measurement %s with value %s", measurement_name, value)
+            self.logger.debug(
+                "Processing measurement %s with value %s", measurement_name, value
+            )
             if measurement_name == "isv":
                 json_data = {
                     f"{code}_{i + 1}": float(subdict[code])

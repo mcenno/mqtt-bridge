@@ -18,4 +18,6 @@ CMD ["python", "./forwarder.py", \
      "--influx-db", "home", \
      "--node-name", "go-eCharger/265302", \
      "--node-name", "go-eController/911832",\
-     "--node-name", "tasmota"]
+     "--node-name", "tasmota",\
+     "--node-name", "solar/dtu1/ac",\
+     "--node-name", "battery"]
