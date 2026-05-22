@@ -20,6 +20,7 @@
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
 
 import argparse
+import datetime
 import json
 import logging
 import sys
@@ -27,7 +28,7 @@ import sys
 import influxdb_client
 import paho.mqtt.client as mqtt
 import requests.exceptions
-from influxdb_client.client.write_api import ASYNCHRONOUS
+from influxdb_client.client.write_api import SYNCHRONOUS
 
 bucket = "home"
 org = "docs"
@@ -51,7 +52,7 @@ class InfluxStore(MessageStore):
         self.influx_client = influxdb_client.InfluxDBClient(
             url=url, token=token, org=org
         )
-        self.write_api = self.influx_client.write_api(write_options=ASYNCHRONOUS)
+        self.write_api = self.influx_client.write_api(write_options=SYNCHRONOUS)
         # influx_client.create_database('sensors')
 
     def store_msg(self, node_name, measurement_name, data):
@@ -72,6 +73,7 @@ class InfluxStore(MessageStore):
             dict_structure["location"] = "Bochum"
             dict_structure["tags"] = {"device": node_name}
             dict_structure["fields"] = data
+            dict_structure["time"] = datetime.datetime.now(datetime.timezone.utc)
 
             p = influxdb_client.Point.from_dict(dict_structure)
             self.write_api.write(bucket=bucket, org=org, record=p)
