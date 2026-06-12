@@ -28,7 +28,7 @@ import sys
 import influxdb_client
 import paho.mqtt.client as mqtt
 import requests.exceptions
-from influxdb_client.client.write_api import SYNCHRONOUS
+from influxdb_client.client.write_api import WriteOptions
 
 bucket = "home"
 org = "docs"
@@ -52,7 +52,9 @@ class InfluxStore(MessageStore):
         self.influx_client = influxdb_client.InfluxDBClient(
             url=url, token=token, org=org
         )
-        self.write_api = self.influx_client.write_api(write_options=SYNCHRONOUS)
+        self.write_api = self.influx_client.write_api(
+            write_options=WriteOptions(batch_size=50, flush_interval=1_000)
+        )
         # influx_client.create_database('sensors')
 
     def store_msg(self, node_name, measurement_name, data):
